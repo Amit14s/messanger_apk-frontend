@@ -1,10 +1,8 @@
 import axios from 'axios'
 
-const apUrl=`${process.env.BACKEND_URL}`
-
-const axiosInstance=axios.create({
-    baseURL:apUrl,
-    withCredentials:true
-})
+const axiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_BACKEND_URL,
+  withCredentials: true
+});
 
 export default axiosInstance
