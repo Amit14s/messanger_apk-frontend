@@ -3,6 +3,11 @@ import { BrowserRouter as Router,Routes,Route } from 'react-router-dom'
 import Login from './pages/user-login/login'
 import {ToastContainer,toast} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
+import { ProtectedRoute, PublicRoute } from './protected.jsx';
+import HomePage from './components/Homepage';
+import UserDetail from './components/UserDetail.jsx';
+import Setting from './pages/settingSection/Setting.jsx';
+import Status from './pages/StatusSection/Status.jsx';
 
 function App() {
   return (
@@ -10,7 +15,17 @@ function App() {
     <ToastContainer  position='top-right' autoClose={4000}/>
     <Router>
       <Routes>
-        <Route  path='/user-login'  element={<Login/>}/>
+        <Route element={<PublicRoute/>}>
+          <Route  path='/user-login'  element={<Login/>}/>
+        </Route>
+
+        <Route element={<ProtectedRoute/>}>
+          <Route  path='/'  element={<HomePage/>}/>
+          <Route  path='/user-Profile'  element={<UserDetail/>}/>
+          <Route  path='/setting'  element={<Setting/>}/>
+          <Route  path='/status'  element={<Status/>}/>
+        </Route>
+        
       </Routes>
     </Router>
     </>

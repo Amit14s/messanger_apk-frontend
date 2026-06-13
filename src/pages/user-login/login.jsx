@@ -8,10 +8,12 @@ import useUserStore from "../../store/useUserStore";
 import useThemeStore from "../../store/themeStore";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
-import { FaArrowLeft, FaChevronDown, FaRocketchat, FaSpinner, FaUsb, FaUser } from "react-icons/fa6";
+import { FaArrowLeft, FaChevronDown, FaPlug, FaPlus, FaRocketchat, FaSpinner, FaUsb, FaUser } from "react-icons/fa6";
 import { Spinner } from "flowbite-react";
 import { sendOtp, updateUserProfile, verifyOtp } from "../../services/user.services";
 import { toast } from "react-toastify";
+import Step1 from "./step1";
+import Step2 from "./step2";
 
 const loginValidationSchema = yup
   .object()
@@ -187,16 +189,16 @@ const Login = () => {
  const onProfileSubmit=async(data)=>{
   try {
        setLoading(true)
-       const FormData=new FormData();
-       FormData.append("username",data.username)
-       FormData.append("agreed",data.agreed)
+       const formData=new FormData();
+       formData.append("username",data.username)
+       formData.append("agreed",data.agreed)
        if(profilePictureFile){
-        FormData.append('media',profilePictureFile)
+        formData.append('media',profilePictureFile)
        }
        else {
-        FormData.append('profilePicture',selectedAvatar)
+        formData.append('profilePicture',selectedAvatar)
        }
-       await updateUserProfile(FormData)
+       await updateUserProfile(formData)
        toast.success("welcome Back to Whatsapp");
        navigate('/');
        resetLoginState();
@@ -273,138 +275,113 @@ const Login = () => {
 
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
-        {step === 1 && (
-          <form className="space-y-4" onSubmit={handleLoginSubmit(onLoginSubmit)}>
-            <p
-              className={`text-center &{theme==='dark'?"text-gray-300":"text-gray-600"} mb-4`}
-            >
-              Enter your phone number to receive an OTP
-            </p>
-            <div className="relative">
-              <div className="flex">
-                <div className="relative w-1/3">
-                  <button
-                    type="button"
-                    onClick={() => setShowDrop(!showDrop)}
-                    className={`flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center ${theme === "dark" ? "text-white bg-gray-700 border-gray-600 " : "text-gray-900 bg-gray-100 border-gray-500"} border rounded-s-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-200`}
-                  >
-                    <span>
-                      {selectedCountry.flag} {selectedCountry.dialCode}
-                    </span>
-                    <FaChevronDown className="ml-2" />
-                  </button>
-                  {showDrop && (
-                    <div
-                      className={`absolute z-10 w-full mt-1 ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"} border rounded-md shadow-lg max-h-60 overflow-auto`}
-                    >
-                      <div
-                        className={`sticky top-0  ${theme === "dark" ? "bg-gray-700" : "bg-white"} p-2`}
-                      >
-                        <input
-                          type="text"
-                          placeholder="Search Countries.."
-                          value={searchItem}
-                          onChange={(e) => setSearchItem(e.target.value)}
-                          className={`w-full px-2 py-1 border ${theme === "dark" ? "bg-gray-600 border-gray-500 text-white" : "bg-white border-gray-300"} rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                        />
-                      </div>
-                      {filterCountries.map((country) => (
-                        <button
-                          key={country.alpha2}
-                          type="button"
-                          className={`w-full text-left px-3 py-2 ${theme === "dark" ? "hover:bg-gray-600" : "hover:bg-gray-300"} focus:outline-none focus:bg-gray-200`}
-                          onClick={() => {
-                            seSelectedCountry(country);
-                            setShowDrop(false);
-                          }}
-                        >
-                          {country.flag} ({country.dialCode}) {country.name}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <input
-                  type="text"
-                  {...loginRegister("phoneNumber")}
-                  value={phoneNumber}
-                  placeholder="Phone Number"
-                  onChange={(e) => setPPhoneNumber(e.target.value)}
-                  className={`w-2/3 px-4 py-2 border  ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${loginErrors.phoneNumber ? "border-red-500 " : ""}`}
-                />
+        {step === 1 && <Step1
+        // these are props i am sending for step 1
+             handleLoginSubmit={handleLoginSubmit}
+             setShowDrop={setShowDrop}
+             showDrop={showDrop}
+             seSelectedCountry={seSelectedCountry}
+              selectedCountry={selectedCountry}
+             setSearchItem={setSearchItem}
+            setEmail={setEmail}
+            email={email}
+            setPPhoneNumber={setPPhoneNumber}
+            phoneNumber={phoneNumber}
+            loginRegister={loginRegister}
+            onLoginSubmit={onLoginSubmit}
+            theme={theme}
+            loginErrors={loginErrors}
+            loading={loading}
+            searchItem={searchItem}
+            filterCountries={filterCountries}
+        />}
+        {step==2 && <Step2
+        handleOtpSubmit={handleOtpSubmit}
+        onOtpSubmit={onOtpSubmit}
+        theme={theme}
+        userPhoneData={userPhoneData}
+        otp={otp}
+        handleOtpChange={handleOtpChange}
+        otpErrors={otpErrors}
+        loading={loading}
+        handleBack={handleBack}
+        />}
+        {step==3 && (
+          <form onSubmit={handleprofileSubmit(onProfileSubmit)} className="space-y-4">
+            <div className="flex flex-col items-center mb-4">
+              <div className="relative w-24 h-24 mb-2">
+              <img
+              src={profilePicture || selectedAvatar}
+              alt="Profile"
+              className="w-full h-full rounded-full object-cover"
+              />
+              <label 
+              htmlFor="profile-picture"
+              className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600 transition duration-200"
+              >
+                <FaPlus className="w-4 h-4"/>
+              </label>
+              <input 
+              type="file"
+              id="profile-picture"
+              accept="image/*"
+              onChange={handleChange}
+              className="hidden"
+              />
               </div>
-              {loginErrors.phoneNumber && (
-                <p className={`text-red-500 test-sm`}>{loginErrors.phoneNumber.message}</p>
-              )}
+              <p className={`text-sm ${theme==='dark'?"text-gray-300":"text-gray-500"} mb-2`}>Choose an avatar</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                 {avatars.map((avatar,index)=>(
+                  <img
+                  key={index}
+                  src={avatar}
+                  alt={`Avatar ${index+1}`}
+                  className={`w-12 h-12 rounded-full cursor-pointer transition duration-300 ease-in-out transform hover:scale-120 ${selectedAvatar===avatar?"ring-2 ring-blue-400":""}`}
+                  onClick={()=>setselectedAvatar(avatar)}
+                  />
+                 ))}
+              </div>
             </div>
-
-            {/* Divider with Or */}
-            <div className="flex items-center my-4">
-              <div className="flex-grow h-px bg-gray-300"/>
-              <span className="mx-3 text-gray-500 text-sm font-medium">OR</span>
-                 <div className="flex-grow h-px bg-gray-300"/>
+            <div className="relative">
+              <FaUser
+              className={`absolute left-3 top-1/3  ${theme==='dark'?"text-gray-400":"text-gray-600"}`}
+              />
+            <input
+            {...profileRegister("username")}
+            type="text"
+            placeholder="username"
+            className={`w-full pl-10 pr-3 py-2 border ${theme==='dark'?"bg-gray-700 border-gray-600 text-white":"bg-white"} rounded-md`}
+            />
+            {profileErrors.username && (
+              <p className="text-red-500 text-sm mt-1"> {profileErrors.username.message}</p>
+            )}
             </div>
-            {/* email input */}
-            <div className={`flex items-center border rounded-md px-3 py-2 ${
-              theme==='dark'?"bg-gray-700 border-gray-600": "bg-white border-gray-300" }focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 `}>
-                <FaUser className={`mr-2 text-gray-400 ${theme==='dark'?"text-gray-400":"text-gray-500"}`}/>
-                <input
-                type='email'
-                {...loginRegister("email")}
-                value={email}
-                onChange={(e)=>setEmail(e.target.value)}
-                placeholder="Email (Optional)"
-                className={`w-full bg-transparent focus:outline-none ${
-                  theme==='dark'?"text-white":"bg-black" 
-                }  ${loginErrors.email?"border-red-500":""}`}
-                />
-
+            <div className="flex items-center space-x-2">
+              <input
+              {...profileRegister("agreed")}
+              type="checkbox"
+              className={`rounded ${theme==='dark'?"text-blue-500 bg-gray-700" :" text-blue-500"} focus:ring-blue-500`}
+              />
+              <label
+              htmlFor="terms" 
+              className={`text-sm ${theme==='dark'?"text-gray-300":"text-gray-700"}`}
+              >
+                 I agree to the {" "}
+                 <a href="#" className="text-red-500 hover:underline">Terms and Conditions</a>
+              </label>
+           {profileErrors.agreed && (
+              <p className="text-red-500 text-sm mt-1"> {profileErrors.agreed.message}</p>
+            )}
+         
             </div>
-            <button 
+               <button 
             type="submit"
-            className={`w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition flex items-center justify-center gap-2`}>
-              { loading  && <FaSpinner className="animate-spin text-center"/>}
-              {loading ?"Loading...":"Send Otp"}
+            disabled={!watch('agreed') || loading }
+            className={`w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center text-lg ${loading?"opacity-50 cursor-not-allowed":""}`}
+            >
+             { loading  && <FaSpinner className="animate-spin text-center"/>}
+                      {loading ?"Loading...":"Create Profile"}
             </button>
-          </form>
-        )}
-        {step==2 && (
-          <form onSubmit={handleOtpSubmit(onOtpSubmit)} className={`space-y-4`}>
-             <p className={`text-center ${theme==='dark'?"text-gray-300":"text-gray-600"} mb-4`}>
-                  Please enter the 6-digit Otp send to your {userPhoneData?.PhoneSuffix || "Email"} {" "}
-                  {userPhoneData.phoneNumber && userPhoneData?.phoneNumber}
-             </p>
-             <div className="flex justify-between">
-              {otp.map((digit,index)=>(
-                <input
-                key={index}
-                id={`otp-${index}`}
-                type='text'
-                maxLength={1}
-                value={digit}
-                onChange={(e)=>handleOtpChange(index,e.target.value)}
-                className={`w-12 h-12 text-center border ${theme==='dark'?"bg-gray-700 border-gray-900 text-white" : "bg-white border-gray-600"} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${otpErrors.otp?"border-red-500":""}`}
-                />
-              ))}
-           {otpErrors.otp && (
-            <p className="text-red-500 text-sm">{otpErrors.otp.message}</p>
-           )}
-     
-             </div>
-                   <button
-           type="submit"
-            className={`w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition flex items-center justify-center gap-2`}>
-          { loading  && <FaSpinner className="animate-spin text-center"/>}
-                      {loading ?"Loading...":"Send Otp"}
-           </button>
-           <button
-           type="button"
-           onClick={handleBack}
-           className={`w-full mt-2 flex justify-center items-center ${theme==='dark'?"bg-gray-700 text-gray-300":"bg-gray-200 text-gray-700"} py-2 rounded-md hover:bg-gray-300 transition flex items-end `}
-           >
-             <FaArrowLeft className="mr-2 my-auto"/>
-             Wrong number ? Go Back
-           </button>
           </form>
         )}
       </motion.div>
