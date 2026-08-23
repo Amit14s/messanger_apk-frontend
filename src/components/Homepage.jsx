@@ -8,7 +8,7 @@ import { getAllUser } from "../services/user.services"
 function HomePage(){
    const setSelectedContact=useLayoutStore((state)=>state.setSelectedContact)
    const [allUser,setAllUser]=useState([]);
-   const getAllUser=async()=>{
+   const getallUser=async()=>{
       try {
          const result=await getAllUser();
          if(result?.status==="success"){
@@ -19,7 +19,7 @@ function HomePage(){
       }
    }
    useEffect(()=>{ 
-      getAllUser()
+      getallUser()
    },[])
    console.log(allUser)
      return(
@@ -32,7 +32,6 @@ function HomePage(){
          >
             <ChatList
             contacts={allUser}
-            setSelectedContact={setSelectedContact}
             />
          </motion.div>
         </Layout>

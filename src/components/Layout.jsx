@@ -14,7 +14,6 @@ const Layout = ({
   statusPreviewContent,
 }) => {
   const { selectedContact, setSelectedContact } = useLayoutStore;
-  const location = useLocation();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const { theme, setTheme } = useThemeStore;
   useEffect(() => {

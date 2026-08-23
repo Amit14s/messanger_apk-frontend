@@ -1,7 +1,7 @@
 
 function ChatWindow(){
      return(
-        <div>
+        <div className="bg-green-300 h-full">
         Chat Window
         </div>
      )
