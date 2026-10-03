@@ -21,7 +21,6 @@ function HomePage(){
    useEffect(()=>{ 
       getallUser()
    },[])
-   console.log(allUser)
      return(
         <Layout>
          <motion.div 

@@ -55,8 +55,7 @@ const Layout = ({
               className={`w-full h-full `}
             >
               <ChatWindow
-                selected
-                Contact={selectedContact}
+                selectedContact={selectedContact}
                 setSelectedContact={setSelectedContact}
                 isMobile={isMobile}
               />

@@ -7,7 +7,7 @@
     if(socket)return socket;
     
     const user=useUserStore.getState().user;
-    const BACKEND_URL = process.env.REACT_APP_API_URL;
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
     socket=io(BACKEND_URL,{
         withCredentials:true,
@@ -16,8 +16,8 @@
         reconnectionDelay:1000,
     });
     socket.on("connect",()=>{
-        console.log("socket connected",socket.id);
-        socket.emit("user_connected",user._id)
+        console.log("socket connected",socket?.id);
+        socket.emit("user_connected",user?._id)
     })
     socket.on("connect_error",(error)=>{
         console.log("socket connection error",error);

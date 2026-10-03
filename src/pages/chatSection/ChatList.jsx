@@ -9,13 +9,13 @@ import formatTimestamp from "../../utils/formatTime";
 
 function ChatList({ contacts }) {
   
-   const { selectedContact, setSelectedContact } = useLayoutStore;
+   const { selectedContact, setSelectedContact } = useLayoutStore();
    const { theme } = useThemeStore();
    const { user } = useUserStore();
    const [searchTerms, setSearchTerms] = useState("");
    const filteredContacts = contacts?.filter((contact) =>
       contact?.username?.toLowerCase().includes(searchTerms.toLowerCase()))
-    console.log(filteredContacts)
+    
    return (
       <div className={`w-full border-r h-screen ${theme === "dark" ? "bg-[rgb(17,27,33)] border-gray-600" : "bg-white border-gray-200"}`}>
         <div className={`p-4 flex justify-between ${theme==="dark"?"text-white" : "text-gray-800"}`}>
@@ -43,7 +43,7 @@ function ChatList({ contacts }) {
           <div className={`overflow-y-auto h-[calc(100vh-120px)]`}>
              {filteredContacts.map((contact)=>(
                <motion.div
-                  key={contact?.id}
+                  key={contact?._id}
                   onClick={()=>setSelectedContact(contact)}
                   className={`p-3 flex items-center cursor-pointer ${theme==='dark'? selectedContact?._id===contact?._id?"bg-gray-700":"hover:bg-gray-800":
                      selectedContact?._id===contact?._id?"bg-gray-200":"hover:bg-gray-100"
