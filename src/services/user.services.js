@@ -16,17 +16,25 @@ export const verifyOtp=async(phoneNumber,phoneSuffix,otpString,email)=>{
         const response=await axiosInstance.post('/auth/verify-otp',{phoneNumber,phoneSuffix,otp,email});
         return response.data;
     } catch (error) {
+        console.log(error)
         throw error.response?error.response.data:error.message;
     }
 }
-export const updateUserProfile=async(updateData)=>{
-     try {
-        const response=await axiosInstance.put('/auth/update-profile',updateData);
+export const updateUserProfile = async (updateData) => {
+    try {
+        const response = await axiosInstance.put(
+            "/auth/update-profile",
+            updateData
+        );
+
         return response.data;
-     } catch (error) {
-         throw error.respponse?error.respponse.data:error.message;
-     }
-}
+
+    } catch (error) {
+        throw error.response
+            ? error.response.data
+            : error.message;
+    }
+};
 
 export const checkUSerAuth=async()=>{
     try {
@@ -41,14 +49,20 @@ export const checkUSerAuth=async()=>{
          throw error.response?error.response.data:error.message;
     }
 }
-export const logoutUser=async ()=>{
+export const logoutUser = async () => {
     try {
-        const response=await axiosInstance.get('/auth/logout');
+        const response = await axiosInstance.get(
+            "/auth/logout"
+        );
+
         return response.data;
+
     } catch (error) {
-         throw error.respponse?error.respponse.data:error.message;
+        throw error.response
+            ? error.response.data
+            : error.message;
     }
-}
+};
 
 export const getAllUser=async ()=>{
     try {

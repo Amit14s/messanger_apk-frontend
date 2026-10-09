@@ -21,7 +21,7 @@ import {
 
 import { FaEllipsisV, FaVideo } from "react-icons/fa";
 
-import MessageBubble from "./messageBubble";
+import MessageBubble from "./MessageBubble";
 
 
 const isValid = (date) => {
@@ -76,7 +76,9 @@ const ChatWindow = ({ isMobile }) => {
 
     const { theme } = useThemeStore();
 
-    const user = useUserStore();
+   const userStore = useUserStore();
+
+const user = userStore?.user || userStore;
 
 
     const {
@@ -362,110 +364,67 @@ const ChatWindow = ({ isMobile }) => {
     // SEND MESSAGE
     // =========================
 
-    const handleSendMessage = async () => {
+   const handleSendMessage = async () => {
+    if (!selectedContact) return;
 
-        if (!selectedContact) return;
+    if (!message.trim() && !selectedFile) {
+        return;
+    }
 
+    try {
+        const formData = new FormData();
 
-        if (
-            !message.trim() &&
-            !selectedFile
-        ) {
-            return;
+        formData.append(
+            "receiverId",
+            selectedContact?._id
+        );
+
+        if (message.trim()) {
+            formData.append(
+                "content",
+                message.trim()
+            );
         }
 
-
-        try {
-
-            const formData =
-                new FormData();
-
-
+        if (selectedFile) {
             formData.append(
-                "senderId",
-                user?._id
+                "media",
+                selectedFile,
+                selectedFile.name
             );
-
-
-            formData.append(
-                "receiverId",
-                selectedContact?._id
-            );
-
-
-            const status =
-                online
-                    ? "delivered"
-                    : "send";
-
-
-            formData.append(
-                "messageStatus",
-                status
-            );
-
-
-            if (message.trim()) {
-
-                formData.append(
-                    "content",
-                    message.trim()
-                );
-
-            }
-
-
-            if (selectedFile) {
-
-                formData.append(
-                    "media",
-                    selectedFile,
-                    selectedFile.name
-                );
-
-            }
-
-
-            await sendMessage(formData);
-
-
-            // Clear only this chat's draft
-            if (selectedContact?._id) {
-
-                messageDraftsRef.current[
-                    selectedContact._id
-                ] = "";
-
-            }
-
-
-            setMessage("");
-
-            setFilePreview(null);
-
-            setSelectedFile(null);
-
-            setShowFileMenu(false);
-
-            setShowEmojiPicker(false);
-
-
-            if (fileInputRef.current) {
-
-                fileInputRef.current.value = "";
-
-            }
-
-        } catch (error) {
-
-            console.error(
-                "Failed to send message",
-                error
-            );
-
         }
 
-    };
+        await sendMessage(formData);
+
+        // Clear message draft
+        if (selectedContact?._id) {
+            messageDraftsRef.current[
+                selectedContact._id
+            ] = "";
+        }
+
+        setMessage("");
+
+    } catch (error) {
+
+        console.error(
+            "Failed to send message",
+            error
+        );
+
+    } finally {
+
+        // Always clear attachment UI
+        setFilePreview(null);
+        setSelectedFile(null);
+        setShowFileMenu(false);
+        setShowEmojiPicker(false);
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    }
+};
 
 
     // =========================
@@ -651,17 +610,13 @@ const ChatWindow = ({ isMobile }) => {
     // REACTION
     // =========================
 
-    const hndleReaction = (
+  const handleReaction = (messageId, emoji) => {
+    addReaction(
         messageId,
-        emoji
-    ) => {
-
-        addReaction(
-            messageId,
-            emoji
-        );
-
-    };
+        emoji,
+        user?._id
+    );
+};
 
 
     // =========================
@@ -675,7 +630,7 @@ const ChatWindow = ({ isMobile }) => {
             <div
                 className={`
                     flex-1
-                    h-screen
+                    ${isMobile ? "h-[calc(100vh-64px)]" : "h-screen"}
                     flex
                     items-center
                     justify-center
@@ -811,7 +766,7 @@ const ChatWindow = ({ isMobile }) => {
         <div
             className={`
                 flex-1
-                h-screen
+                 ${isMobile ? "h-[calc(100vh-64px)]" : "h-screen"}
                 w-full
                 flex
                 flex-col
@@ -1248,28 +1203,10 @@ const ChatWindow = ({ isMobile }) => {
                                                 (msg) => (
 
                                                     <MessageBubble
-                                                        key={
-                                                            msg._id ||
-                                                            msg.tempId
-                                                        }
-
+                                                      key={msg._id || msg.tempId}
                                                         message={msg}
-
-                                                        theme={
-                                                            theme
-                                                        }
-
-                                                        currentUser={
-                                                            user
-                                                        }
-
-                                                        onReact={
-                                                            hndleReaction
-                                                        }
-
-                                                        deleteMessage={
-                                                            deleteMessage
-                                                        }
+                                                        theme={theme}
+                                                        currentUser={user}
                                                     />
 
                                                 )
