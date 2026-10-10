@@ -15,6 +15,9 @@ import axiosInstance from "../../services/url.service";
 import useUserStore from "../../store/useUserStore";
 import useThemeStore from "../../store/themeStore";
 import { useChatStore } from "../../store/chatStore";
+import SideBar from "../../components/Sidebar";
+
+
 
 const getResponseData = (response) => {
     const body = response?.data;
@@ -59,6 +62,7 @@ const Status = () => {
         : "border-gray-200 bg-white text-gray-900";
 
     const muted = dark ? "text-gray-400" : "text-gray-500";
+    // useeffect for sidebar
 
     useEffect(() => {
         let cancelled = false;
@@ -103,6 +107,23 @@ const Status = () => {
 
         return () => URL.revokeObjectURL(preview);
     }, [preview]);
+
+     const [isMobile, setIsMobile] = useState(
+         window.innerWidth < 768
+     );
+     useEffect(() => {
+     
+             const handleWindow = () => {
+                 setIsMobile(window.innerWidth < 768);
+             };
+     
+             window.addEventListener("resize", handleWindow);
+     
+             return () => {
+                 window.removeEventListener("resize", handleWindow);
+             };
+     
+         }, []);
 
     const groups = useMemo(() => {
         const map = new Map();
@@ -392,8 +413,14 @@ const Status = () => {
     };
 
     return (
-        <main
-            className={`min-h-screen p-4 sm:p-6 ${
+        <div className={`flex w-full h-screen overflow-hidden ${
+        theme === "dark"
+            ? "bg-[#111b21]"
+            : "bg-[rgb(239,242,254)]"
+    }`}>
+            {!isMobile && <SideBar />}
+            <main
+            className={`flex-1 min-w-0 h-full overflow-y-auto p-4 sm:p-6 ${
                 dark ? "bg-gray-950" : "bg-gray-50"
             }`}
         >
@@ -844,6 +871,9 @@ const Status = () => {
                 </div>
             )}
         </main>
+        {/* MOBILE SIDEBAR */}
+            {isMobile && <SideBar />}
+        </div>
     );
 };
 

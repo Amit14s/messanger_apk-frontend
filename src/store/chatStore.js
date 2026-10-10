@@ -92,18 +92,15 @@ export const useChatStore = create((set, get) => ({
         );
 
         // Delete message
-        socket.on(
-            "message_deletion",
-            ({ deletedMessageId }) => {
-                set((state) => ({
-                    messages: state.messages.filter(
-                        (msg) =>
-                            String(msg._id) !==
-                            String(deletedMessageId)
-                    ),
-                }));
-            }
-        );
+        socket.on("message_deleted", (messageId) => {
+            if (!messageId) return;
+
+            set((state) => ({
+                messages: state.messages.filter(
+                    (msg) => String(msg._id) !== String(messageId)
+                ),
+            }));
+        });
 
         // Message error
         socket.on("message_error", (error) => {
@@ -283,7 +280,7 @@ export const useChatStore = create((set, get) => ({
         } catch (error) {
             console.error(
                 error?.response?.data?.message ||
-                    error?.message
+                error?.message
             );
 
             set({
@@ -440,11 +437,11 @@ export const useChatStore = create((set, get) => ({
 
                 const updateConversation = (conv) =>
                     String(conv._id) ===
-                    String(conversationId)
+                        String(conversationId)
                         ? {
-                              ...conv,
-                              lastMessage: messageData,
-                          }
+                            ...conv,
+                            lastMessage: messageData,
+                        }
                         : conv;
 
                 return {
@@ -473,12 +470,12 @@ export const useChatStore = create((set, get) => ({
                 messages: state.messages.map((msg) =>
                     msg._id === tempId
                         ? {
-                              ...msg,
-                              messageStatus: "failed",
-                              error:
-                                  error?.response?.data?.message ||
-                                  error?.message,
-                          }
+                            ...msg,
+                            messageStatus: "failed",
+                            error:
+                                error?.response?.data?.message ||
+                                error?.message,
+                        }
                         : msg
                 ),
             }));
@@ -596,7 +593,7 @@ export const useChatStore = create((set, get) => ({
                 (msg) =>
                     msg.messageStatus !== "read" &&
                     String(msg.receiver?._id) ===
-                        String(currentUser?._id)
+                    String(currentUser?._id)
             )
             .map((msg) => msg._id);
 
@@ -614,9 +611,9 @@ export const useChatStore = create((set, get) => ({
                 messages: state.messages.map((msg) =>
                     unreadIds.includes(msg._id)
                         ? {
-                              ...msg,
-                              messageStatus: "read",
-                          }
+                            ...msg,
+                            messageStatus: "read",
+                        }
                         : msg
                 ),
             }));
@@ -791,9 +788,9 @@ export const useChatStore = create((set, get) => ({
             const params = isEmail
                 ? { email: input.trim() }
                 : {
-                      phoneNumber: input.trim(),
-                      phoneSuffix: phoneSuffix.trim(),
-                  };
+                    phoneNumber: input.trim(),
+                    phoneSuffix: phoneSuffix.trim(),
+                };
 
             const { data } = await axiosInstance.get(
                 "/auth/search-user",
@@ -843,11 +840,11 @@ export const useChatStore = create((set, get) => ({
             return {
                 statuses: exists
                     ? state.statuses.map((status) =>
-                          String(status._id) ===
-                          String(newStatus._id)
-                              ? { ...status, ...newStatus }
-                              : status
-                      )
+                        String(status._id) ===
+                            String(newStatus._id)
+                            ? { ...status, ...newStatus }
+                            : status
+                    )
                     : [newStatus, ...state.statuses],
             };
         });
@@ -864,12 +861,12 @@ export const useChatStore = create((set, get) => ({
 
             statuses: state.statuses.map((status) =>
                 String(status._id) ===
-                String(data.statusId)
+                    String(data.statusId)
                     ? {
-                          ...status,
-                          viewers:
-                              data.viewers ?? status.viewers,
-                      }
+                        ...status,
+                        viewers:
+                            data.viewers ?? status.viewers,
+                    }
                     : status
             ),
         }));

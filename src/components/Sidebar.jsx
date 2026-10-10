@@ -46,7 +46,7 @@ const SideBar = () => {
          </Link>
 
            <Link
-            to='status'
+            to='/status'
             className={`${isMobile ? "" : "mb-8"} ${activeTab === "status" && "bg-gray-300 shadow-sm p-2 rounded-full"} focus:outline-none`}
          >
             <MdOutlineRadioButtonChecked
@@ -56,7 +56,7 @@ const SideBar = () => {
          </Link>
 
             <Link
-            to='user-profile'
+            to='/user-profile'
             className={`${isMobile ? "" : "mb-8"} ${activeTab === "profile" && "bg-gray-300 shadow-sm p-2 rounded-full"} focus:outline-none`}
          >
             {user?.profilePicture?(
