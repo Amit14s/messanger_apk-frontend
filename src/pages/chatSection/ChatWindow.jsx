@@ -82,22 +82,23 @@ const user = userStore?.user || userStore;
 
 
     const {
-        messages,
-        loading,
-        sendMessage,
-        receiveMessage,
-        fetchMessages,
-        fetchConversation,
-        conversations,
-        isUserTyping,
-        startTyping,
-        stopTyping,
-        getUserLastSeen,
-        isUserOnline,
-        deleteMessage,
-        addReaction,
-        cleanup
-    } = useChatStore();
+    messages,
+    loading,
+    sendMessage,
+    receiveMessage,
+    fetchMessages,
+    fetchConversation,
+    conversations,
+    isUserTyping,
+    startTyping,
+    stopTyping,
+    getUserLastSeen,
+    isUserOnline,
+    deleteMessage,
+    addReaction,
+    cleanup,
+    setCurrentUser,
+} = useChatStore();
 
 
     const online =
@@ -216,7 +217,12 @@ const user = userStore?.user || userStore;
         selectedContact,
         conversations
     ]);
-
+     
+    useEffect(() => {
+    if (user?._id) {
+        setCurrentUser(user);
+    }
+}, [user?._id, setCurrentUser]);
 
     // =========================
     // FETCH CONVERSATIONS

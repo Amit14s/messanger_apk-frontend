@@ -15,10 +15,17 @@
         reconnectionAttempts:5,
         reconnectionDelay:1000,
     });
-    socket.on("connect",()=>{
-        console.log("socket connected",socket?.id);
-        socket.emit("user_connected",user?._id)
-    })
+   socket.on("connect", () => {
+    console.log("socket connected", socket.id);
+
+    const user = useUserStore.getState().user;
+
+    if (user?._id) {
+        socket.emit("user_connected", String(user._id));
+    } else {
+        console.warn("Socket connected, but no authenticated user is available");
+    }
+});
     socket.on("connect_error",(error)=>{
         console.log("socket connection error",error);
     })
