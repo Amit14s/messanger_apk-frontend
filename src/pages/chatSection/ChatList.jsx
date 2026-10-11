@@ -99,6 +99,10 @@ function ChatList({ contacts }) {
 
                const lastMessageDate =
                   contact?.conversation?.lastMessage?.createdAt;
+               const lastSeen = contact?.lastSeen;
+
+               const hasValidLastSeen = lastSeen &&
+                  !Number.isNaN(new Date(lastSeen).getTime());
 
                const hasValidDate =
                   lastMessageDate &&
@@ -140,17 +144,17 @@ function ChatList({ contacts }) {
                               <span className="text-xs text-green-500 font-medium">
                                  online
                               </span>
+                           ) : hasValidLastSeen ? (
+                              <span
+                                 className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"
+                                    }`}
+                              >
+                                 Last seen {formatTimestamp(lastSeen)}
+                              </span>
                            ) : (
-                              hasValidDate && (
-                                 <span
-                                    className={`text-xs ${theme === "dark"
-                                          ? "text-gray-400"
-                                          : "text-gray-500"
-                                       }`}
-                                 >
-                                    {formatTimestamp(lastMessageDate)}
-                                 </span>
-                              )
+                              <span className="text-xs text-gray-400">
+                                 Offline
+                              </span>
                            )}
                         </div>
 
@@ -159,10 +163,10 @@ function ChatList({ contacts }) {
 
                            <p
                               className={`text-sm truncate ${isTyping
-                                    ? "text-green-500 font-medium"
-                                    : theme === "dark"
-                                       ? "text-gray-400"
-                                       : "text-gray-500"
+                                 ? "text-green-500 font-medium"
+                                 : theme === "dark"
+                                    ? "text-gray-400"
+                                    : "text-gray-500"
                                  }`}
                            >
                               {isTyping
