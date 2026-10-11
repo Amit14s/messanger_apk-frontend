@@ -489,95 +489,101 @@ export const useChatStore = create((set, get) => ({
     // =========================
 
     receiveMessage: (message) => {
-        if (!message) return;
+    if (!message) return;
 
-        const {
-            currentConversation,
-            currentUser,
-            messages,
-        } = get();
+    const {
+        currentConversation,
+        currentUser,
+    } = get();
 
-        // Prevent duplicate messages
-        const messageExists = messages.some(
-            (msg) =>
-                String(msg._id) === String(message._id)
-        );
+    // Handle both string IDs and populated objects
+    const getId = (value) => {
+        if (!value) return null;
 
-        if (messageExists) return;
-
-        // Add message if this conversation is open
-        if (
-            String(message.conversation) ===
-            String(currentConversation)
-        ) {
-            set((state) => ({
-                messages: [
-                    ...state.messages,
-                    message,
-                ],
-            }));
-
-            if (
-                String(message.receiver?._id) ===
-                String(currentUser?._id)
-            ) {
-                get().maskMessagesAsRead();
-            }
+        if (typeof value === "object") {
+            return value._id ? String(value._id) : null;
         }
 
-        // Update conversation list
-        set((state) => {
-            if (!state.conversations?.data) {
-                return {};
-            }
+        return String(value);
+    };
 
-            const updateConversations =
-                state.conversations.data.map((conv) => {
-                    if (
-                        String(conv._id) !==
-                        String(message.conversation)
-                    ) {
-                        return conv;
-                    }
+    const conversationId = getId(
+        message.conversation || message.conversationId
+    );
 
-                    const isMyMessage =
-                        String(message.sender?._id) ===
-                        String(currentUser?._id);
+    const currentConversationId = getId(currentConversation);
+    const currentUserId = getId(currentUser);
 
-                    const isReceivedByMe =
-                        String(message.receiver?._id) ===
-                        String(currentUser?._id);
+    const senderId = getId(message.sender);
+    const receiverId = getId(message.receiver);
 
-                    return {
-                        ...conv,
-                        lastMessage: message,
+    const isIncoming = receiverId === currentUserId;
+    const isOpen = conversationId === currentConversationId;
 
-                        unreadCount: isReceivedByMe && !isMyMessage
-                            ? (conv.unreadCount || 0) + 1
-                            : conv.unreadCount || 0,
-                    };
-                });
+    // Update messages without inserting duplicates
+    set((state) => {
+        const exists = state.messages.some(
+            (msg) => String(msg._id) === String(message._id)
+        );
 
-            return {
-                conversations: {
-                    ...state.conversations,
-                    data: updateConversations,
-                },
+        let messages = state.messages;
 
-                conversation: {
-                    ...state.conversation,
-                    data: state.conversation?.data?.map(
-                        (conv) =>
-                            updateConversations.find(
-                                (item) =>
-                                    String(item._id) ===
-                                    String(conv._id)
-                            ) || conv
-                    ),
-                },
+        if (isOpen && !exists) {
+            messages = [...messages, message];
+        }
+
+        // Update the sidebar conversation
+        const updateList = (list) => {
+            if (!Array.isArray(list)) return list;
+
+            const index = list.findIndex(
+                (conv) => getId(conv._id) === conversationId
+            );
+
+            if (index === -1) return list;
+
+            const oldConv = list[index];
+
+            const updatedConv = {
+                ...oldConv,
+                lastMessage: message,
+                unreadCount:
+                    isIncoming && !isOpen && !exists
+                        ? (oldConv.unreadCount || 0) + 1
+                        : oldConv.unreadCount || 0,
             };
-        });
-    },
+
+            // Move the updated conversation to the top
+            return [
+                updatedConv,
+                ...list.filter((_, i) => i !== index),
+            ];
+        };
+
+        return {
+            messages,
+
+            conversations: state.conversations
+                ? {
+                    ...state.conversations,
+                    data: updateList(state.conversations.data),
+                }
+                : state.conversations,
+
+            conversation: state.conversation
+                ? {
+                    ...state.conversation,
+                    data: updateList(state.conversation.data),
+                }
+                : state.conversation,
+        };
+    });
+
+    // If the receiver is already viewing this chat, mark messages read
+    if (isIncoming && isOpen) {
+        get().maskMessagesAsRead();
+    }
+},
 
     // =========================
     // MARK MESSAGES AS READ
