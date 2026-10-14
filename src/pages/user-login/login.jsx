@@ -227,7 +227,7 @@ const Login = () => {
   setUserPhoneData(null);
   setOtp(["","","","","",""])
   setError("")
-  setOtpValue("");
+  setValue("");
  }
 
   const ProgressBar = () => (
