@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { useChatStore } from "../store/chatStore.js";C
 import {
     FaArrowLeft,
     FaEdit,
@@ -19,12 +19,12 @@ import {
     updateUserProfile,
     logoutUser
 } from "../services/user.services.js";
-
+import { disconnectSocket } from "../services/chat.service";
 
 function UserProfile() {
 
     const navigate = useNavigate();
-
+    const cleanup = useChatStore(state => state.cleanup);
     const { theme, setTheme } = useThemeStore();
     const {user,isAuthenticated,setUser,clearUser}=useUserStore();
     const [edit, setEdit] = useState(false);
@@ -122,27 +122,24 @@ function UserProfile() {
     // =========================
     // LOGOUT
     // =========================
+
+
 const handleLogout = async () => {
     try {
-        setLoading(true);
-        setError("");
+        const res = await logoutUser();
 
-        await logoutUser();
-
-        clearUser();
-
-        window.location.href = "/user-login";
-
+        if (res.status === "success") {
+            clearUser();
+            cleanup();
+            disconnectSocket();
+            navigate("/user-login", { replace: true });
+        }
     } catch (error) {
-        console.error("Logout error:", error);
-
-        setError(
-            error?.message || "Failed to logout"
-        );
-    } finally {
-        setLoading(false);
+        console.error("Logout failed:", error);
     }
 };
+
+
 
 
     return (
