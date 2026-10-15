@@ -636,7 +636,10 @@ const user = userStore?.user || userStore;
             <div
                 className={`
                     flex-1
-                    ${isMobile ? "h-[calc(100vh-64px)]" : "h-screen"}
+                    min-h-0
+                    min-w-0
+                    ${isMobile ? "h-[calc(100dvh-64px)]" : "h-screen"}
+                    overflow-hidden
                     flex
                     items-center
                     justify-center
@@ -772,7 +775,9 @@ const user = userStore?.user || userStore;
         <div
             className={`
                 flex-1
-                 ${isMobile ? "h-[calc(100vh-64px)]" : "h-screen"}
+                min-h-0
+                min-w-0
+                ${isMobile ? "h-[calc(100dvh-64px)]" : "h-screen"}
                 w-full
                 flex
                 flex-col
@@ -1037,11 +1042,13 @@ const user = userStore?.user || userStore;
             <div
                 className={`
                     flex-1
+                    min-h-0
+                    min-w-0
                     overflow-y-auto
+                    overscroll-contain
                     px-3
                     sm:px-6
                     py-5
-                    scroll-smooth
 
                     ${
                         theme === "dark"
@@ -1410,6 +1417,8 @@ const user = userStore?.user || userStore;
 
             <div
                 className={`
+                    relative
+                    z-10
                     shrink-0
                     px-3
                     sm:px-5
