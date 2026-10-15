@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useChatStore } from "../store/chatStore.js";C
+import { useChatStore } from "../store/chatStore.js";
 import {
     FaArrowLeft,
     FaEdit,
