@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaTimes, FaSearch } from "react-icons/fa";
 import { useChatStore } from "../../store/chatStore";
-
+// ....................................
 function AddUser({ onClose, onUserSelect, theme }) {
 
     const [input, setInput] = useState("");
